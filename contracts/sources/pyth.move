@@ -15,13 +15,13 @@ module coin_x_oracle::pyth {
   use suitears::owner::{Self, OwnerCap};
   use suitears::oracle::{Self, Oracle, Request};  
 
-  use wormhole::vaa::{parse_and_verify};  
+  use wormhole::vaa::parse_and_verify;  
   use wormhole::state::{State as WormholeState};
 
   use pyth::i64;
   use pyth::hot_potato_vector;
-  use pyth::state::{State as PythState};
-  use pyth::price::{Self as pyth_price};
+  use pyth::state::State as PythState;
+  use pyth::price::Self as pyth_price;
   use pyth::price_info::{Self, PriceInfoObject};
   use pyth::pyth::{get_price as pyth_get_price, create_price_infos_hot_potato, update_single_price_feed};
 
