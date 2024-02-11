@@ -48,22 +48,6 @@ module coin_x_oracle::pyth {
   // === Public-Mutative Functions ===
 
   /*
-  * @notice Adds the `PythFeed` feed to the `oracle`.  
-  *
-  * @dev By default, this oracle will require prices to have a confidence level of 98% or higher.
-  * 
-  * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
-  * @param cap The `suitears::owner::OwnerCap` of `self`.   
-  * @param price_info_object This Pyth Network Price Info Object will be whitelisted.
-  */
-  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, price_info_object: &PriceInfoObject) {
-    oracle::add(oracle, cap, type_name::get<PythFeed>());
-    let uid = oracle::uid_mut(oracle, cap);
-    df::add(uid, PriceInfoObjectKey {}, price_info::uid_to_inner(price_info_object));
-    df::add(uid, ConfidenceKey {}, TWO_PERCENT);
-  }  
-
-  /*
   * @notice Adds a `PythFeed` report to a `suitears::oracle::Request`.  
   *
   * @param self A `suiterars::oracle::Oracle` with this module's witness.    
@@ -135,6 +119,22 @@ module coin_x_oracle::pyth {
   }  
 
   // === Admin Functions ===  
+
+  /*
+  * @notice Adds the `PythFeed` feed to the `oracle`.  
+  *
+  * @dev By default, this oracle will require prices to have a confidence level of 98% or higher.
+  * 
+  * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
+  * @param cap The `suitears::owner::OwnerCap` of `self`.   
+  * @param price_info_object This Pyth Network Price Info Object will be whitelisted.
+  */
+  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, price_info_object: &PriceInfoObject) {
+    oracle::add(oracle, cap, type_name::get<PythFeed>());
+    let uid = oracle::uid_mut(oracle, cap);
+    df::add(uid, PriceInfoObjectKey {}, price_info::uid_to_inner(price_info_object));
+    df::add(uid, ConfidenceKey {}, TWO_PERCENT);
+  }  
 
   /*
   * @notice Updates the required confidence interval percentage for the `self`.  

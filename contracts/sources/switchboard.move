@@ -24,22 +24,6 @@ module coin_x_oracle::switchboard {
   // === Public-Mutative Functions ===
 
   /*
-  * @notice Adds the `SwitchboardFeed` to an `oracle`.  
-  *
-  * @param self The `suiterars::oracle::Oracle` that will require a Switchboard report.    
-  * @param cap The `suitears::owner::OwnerCap` of `self`.   
-  * @param aggregator `switchboard::aggregator::Aggregator` that the `self` will use to report the price.  
-  *
-  * aborts-if:   
-  * - The `self` has the this module's witness already.
-  */
-  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, aggregator: &Aggregator) {
-    oracle::add(oracle, cap, type_name::get<SwitchboardFeed>());
-    let uid = oracle::uid_mut(oracle, cap);
-    df::add(uid, AggregatorKey {}, aggregator::aggregator_address(aggregator));
-  }
-
-  /*
   * @notice Adds a `SwitchboardFeed` report to a `suitears::oracle::Request`.  
   *
   * @param self A `suiterars::oracle::Oracle` with this module's witness.    
@@ -62,4 +46,22 @@ module coin_x_oracle::switchboard {
 
     oracle::report(request, SwitchboardFeed {}, latest_timestamp, value, scaling_factor);
   }
+
+  // === Admin Functions ===  
+
+  /*
+  * @notice Adds the `SwitchboardFeed` to an `oracle`.  
+  *
+  * @param self The `suiterars::oracle::Oracle` that will require a Switchboard report.    
+  * @param cap The `suitears::owner::OwnerCap` of `self`.   
+  * @param aggregator `switchboard::aggregator::Aggregator` that the `self` will use to report the price.  
+  *
+  * aborts-if:   
+  * - The `self` has the this module's witness already.
+  */
+  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, aggregator: &Aggregator) {
+    oracle::add(oracle, cap, type_name::get<SwitchboardFeed>());
+    let uid = oracle::uid_mut(oracle, cap);
+    df::add(uid, AggregatorKey {}, aggregator::aggregator_address(aggregator));
+  }  
 }
