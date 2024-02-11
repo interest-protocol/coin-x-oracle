@@ -9,9 +9,10 @@ module coin_x_oracle::pyth {
   use sui::clock::Clock;
   use sui::dynamic_field as df;
 
+  use suitears::fixed_point_wad;
   use suitears::owner::OwnerCap;
+  use suitears::math256::mul_div_down;
   use suitears::oracle::{Self, Oracle, Request};  
-  use suitears::math256::{mul_div_down, div_up};
 
   use wormhole::vaa::{parse_and_verify};  
   use wormhole::state::{State as WormholeState};
@@ -26,12 +27,13 @@ module coin_x_oracle::pyth {
   // === Errors ===
 
   const EInvalidPriceObjectInfo: u64 = 0;
-  const ENegativePrice: u64 = 1;
+  const EZeroPrice: u64 = 1;
   const EPriceConfidenceOutOfRange: u64 = 2;
 
   // === Constants ===
 
   const POW_10_18: u256 = 1000000000000000000; // 1e18
+  const TWO_PERCENT: u256 = 20000000000000000; // 0.02e18
 
   // === Structs ===
 
@@ -42,18 +44,35 @@ module coin_x_oracle::pyth {
   // === Public-Mutative Functions ===
 
   /*
-  * @notice Adds the Switchboard feed to the `oracle`.  
+  * @notice Adds the `PythFeed` feed to the `oracle`.  
   *
-  * @param self The `Oracle` that will support Switchboard.    
+  * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
   * @param cap The `suitears::owner::OwnerCap` of `self`.   
-  * @param price_info_object The Pyth Network Price Info Object Id that will be associated with a price feed.
+  * @param price_info_object This Pyth Network Price Info Object will be whitelisted.
   */
-  public fun new<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, price_info_object: &PriceInfoObject) {
+  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, price_info_object: &PriceInfoObject) {
     oracle::add(oracle, cap, type_name::get<PythFeed>());
     let uid = oracle::uid_mut(oracle, cap);
     df::add(uid, PriceInfoObjectKey {}, price_info::uid_to_inner(price_info_object));
   }  
 
+  /*
+  * @notice Adds a `PythFeed` report to a `suitears::oracle::Request`.  
+  *
+  * @param self A `suiterars::oracle::Oracle` with this module's witness.    
+  * @param request A hot potato issued from the `self` to create a `suiterars::oracle::Price`.  
+  * @param wormhole_state The state of the Wormhole module on Sui.
+  * @param pyth_state The state of the Pyth module on Sui.
+  * @param buf Price attestations in bytes.
+  * @param price_info_object An object that contains price information. One per asset.
+  * @param pyth_fee There is a cost to request a price update from Pyth.
+  * @param clock_object The shared Clock object from Sui.
+  *
+  * aborts-if:    
+  * - The `price_info_object` is not whitelisted.   
+  * - The price confidence is out of range.  
+  * - The price is negative or zero.   
+  */
   public fun report<Witness: drop>(
     oracle: &Oracle<Witness>, 
     request: &mut Request, 
@@ -91,7 +110,7 @@ module coin_x_oracle::pyth {
 
     assert_price_conf(pyth_price_u64, price_conf);
 
-    assert!(pyth_price_u64 != 0, ENegativePrice);
+    assert!(pyth_price_u64 != 0, EZeroPrice);
 
     let is_exponent_negative = i64::get_is_negative(&pyth_price_expo);
     
@@ -110,10 +129,19 @@ module coin_x_oracle::pyth {
 
   // === Private Functions ===
   
+  /*
+  * @notice Ensures that we are reporting a price with a confidence interval of 98% or higher. 
+  *
+  * @dev Read about price confidence intervals here: https://docs.pyth.network/price-feeds/pythnet-price-feeds/best-practices
+  *
+  * @param price_value The price
+  * @param price_conf The confidence interval for the `price_value`
+  *
+  * aborts-if:  
+  * - The `price_value`'s confidence interface is lower than 98%. 
+  */
   fun assert_price_conf(price_value: u64, price_conf: u64) {
-    let base = 10000;
-    let price_conf_range = 2 * base; // 2% of price
-    let price_conf_diff = div_up((price_conf as u256) * base * 100, (price_value as u256));
-    assert!(price_conf_range >= price_conf_diff, EPriceConfidenceOutOfRange);
+    let price_conf_percentage = fixed_point_wad::div_up((price_conf as u256), (price_value as u256));
+    assert!(TWO_PERCENT >= price_conf_percentage, EPriceConfidenceOutOfRange);
   }  
 }

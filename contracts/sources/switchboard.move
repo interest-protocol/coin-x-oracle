@@ -24,18 +24,32 @@ module coin_x_oracle::switchboard {
   // === Public-Mutative Functions ===
 
   /*
-  * @notice Adds the Switchboard feed to the `oracle`.  
+  * @notice Adds the `SwitchboardFeed` to an `oracle`.  
   *
-  * @param self The `Oracle` that will support Switchboard.    
+  * @param self The `suiterars::oracle::Oracle` that will require a Switchboard report.    
   * @param cap The `suitears::owner::OwnerCap` of `self`.   
   * @param aggregator `switchboard::aggregator::Aggregator` that the `self` will use to report the price.  
+  *
+  * aborts-if:   
+  * - The `self` has the this module's witness already.
   */
-  public fun new<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, aggregator: &Aggregator) {
+  public fun add<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, aggregator: &Aggregator) {
     oracle::add(oracle, cap, type_name::get<SwitchboardFeed>());
     let uid = oracle::uid_mut(oracle, cap);
     df::add(uid, AggregatorKey {}, aggregator::aggregator_address(aggregator));
   }
 
+  /*
+  * @notice Adds a `SwitchboardFeed` report to a `suitears::oracle::Request`.  
+  *
+  * @param self A `suiterars::oracle::Oracle` with this module's witness.    
+  * @param request A hot potato issued from the `self` to create a `suiterars::oracle::Price`.  
+  * @param aggregator `switchboard::aggregator::Aggregator` that the `self` will use to fetch the price.  
+  *
+  * aborts-if:    
+  * - The `aggregator` is not whitelisted.   
+  * - The `aggregator` price is negative or zero.  
+  */
   public fun report<Witness: drop>(oracle: &Oracle<Witness>, request: &mut Request, aggregator: &Aggregator) {
     let whitelisted_address = *df::borrow<AggregatorKey, address>(oracle::uid(oracle), AggregatorKey {});
     assert!(aggregator::aggregator_address(aggregator) == whitelisted_address, EInvalidAggregator);
