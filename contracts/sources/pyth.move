@@ -2,6 +2,7 @@ module coin_x_oracle::pyth {
   // === Imports ===
   use std::type_name;
   
+  use sui::object;
   use sui::sui::SUI;
   use sui::math::pow;
   use sui::object::ID;
@@ -10,8 +11,8 @@ module coin_x_oracle::pyth {
   use sui::dynamic_field as df;
 
   use suitears::fixed_point_wad;
-  use suitears::owner::OwnerCap;
   use suitears::math256::mul_div_down;
+  use suitears::owner::{Self, OwnerCap};
   use suitears::oracle::{Self, Oracle, Request};  
 
   use wormhole::vaa::{parse_and_verify};  
@@ -34,10 +35,13 @@ module coin_x_oracle::pyth {
 
   const POW_10_18: u256 = 1000000000000000000; // 1e18
   const TWO_PERCENT: u256 = 20000000000000000; // 0.02e18
+  const HUNDRED_PERCENT: u256 = 100000000000000000000; // 100e18.
 
   // === Structs ===
 
   struct PriceInfoObjectKey has copy, drop, store {}
+
+  struct ConfidenceKey has copy, drop, store {}
 
   struct PythFeed has drop {}
 
@@ -46,6 +50,8 @@ module coin_x_oracle::pyth {
   /*
   * @notice Adds the `PythFeed` feed to the `oracle`.  
   *
+  * @dev By default, this oracle will require prices to have a confidence level of 98% or higher.
+  * 
   * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
   * @param cap The `suitears::owner::OwnerCap` of `self`.   
   * @param price_info_object This Pyth Network Price Info Object will be whitelisted.
@@ -54,6 +60,7 @@ module coin_x_oracle::pyth {
     oracle::add(oracle, cap, type_name::get<PythFeed>());
     let uid = oracle::uid_mut(oracle, cap);
     df::add(uid, PriceInfoObjectKey {}, price_info::uid_to_inner(price_info_object));
+    df::add(uid, ConfidenceKey {}, TWO_PERCENT);
   }  
 
   /*
@@ -108,7 +115,7 @@ module coin_x_oracle::pyth {
 
     let pyth_price_u64 = i64::get_magnitude_if_positive(&pyth_price_value);
 
-    assert_price_conf(pyth_price_u64, price_conf);
+    assert_price_conf(oracle, pyth_price_u64, price_conf);
 
     assert!(pyth_price_u64 != 0, EZeroPrice);
 
@@ -127,6 +134,27 @@ module coin_x_oracle::pyth {
     oracle::report(request, PythFeed {}, latest_timestamp, (value as u128), 18);
   }  
 
+  // === Admin Functions ===  
+
+  /*
+  * @notice Updates the required confidence interval percentage for the `self`.  
+  * 
+  * @dev Note that you can add a confidence interface percentage of 0%. We recommend a value higher than 95%.
+  *
+  * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
+  * @param cap The `suitears::owner::OwnerCap` of `self`.   
+  * @param conf The new confidence.
+  *
+  * aborts-if 
+  * - The `cap` does not own the `self`.
+  * - The `conf` is higher than 100%.
+  */
+  public fun update_confidence<Witness: drop>(oracle: &mut Oracle<Witness>, cap: &OwnerCap<Witness>, conf: u256) {
+    owner::assert_ownership(cap, object::id(oracle));
+    let saved_conf = df::borrow_mut<ConfidenceKey, u256>(oracle::uid_mut(oracle, cap), ConfidenceKey {});
+    *saved_conf = HUNDRED_PERCENT - conf;
+  }
+
   // === Private Functions ===
   
   /*
@@ -134,14 +162,16 @@ module coin_x_oracle::pyth {
   *
   * @dev Read about price confidence intervals here: https://docs.pyth.network/price-feeds/pythnet-price-feeds/best-practices
   *
+  * @param self The `suiterars::oracle::Oracle` that contains the required confidence percentage.   
   * @param price_value The price
   * @param price_conf The confidence interval for the `price_value`
   *
   * aborts-if:  
   * - The `price_value`'s confidence interface is lower than 98%. 
   */
-  fun assert_price_conf(price_value: u64, price_conf: u64) {
+  fun assert_price_conf<Witness: drop>(oracle: &Oracle<Witness>, price_value: u64, price_conf: u64) {
     let price_conf_percentage = fixed_point_wad::div_up((price_conf as u256), (price_value as u256));
-    assert!(TWO_PERCENT >= price_conf_percentage, EPriceConfidenceOutOfRange);
+    let required_conf = *df::borrow<ConfidenceKey, u256>(oracle::uid(oracle), ConfidenceKey {});
+    assert!(required_conf >= price_conf_percentage, EPriceConfidenceOutOfRange);
   }  
 }

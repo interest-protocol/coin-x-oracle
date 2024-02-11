@@ -7,7 +7,7 @@ MoveStdlib = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/s
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet", override=true  }
 SuiTears = { git = "https://github.com/interest-protocol/suitears.git" , subdir = "contracts", rev = "testnet" }
 SwitchboardStdLib = { git = "https://github.com/switchboard-xyz/sbv2-sui.git", subdir = "move/testnet/switchboard_std/", rev = "main"  }
-Pyth = { local = "../pyth" }
+Pyth = { local = "../dependencies/pyth" }
 Wormhole = { git = "https://github.com/wormhole-foundation/wormhole.git", subdir = "sui/wormhole", rev = "d050ad1d67a5b7da9fb65030aad12ef5d774ccad"  }
 
 [addresses]

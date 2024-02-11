@@ -2,7 +2,7 @@
 
 [move]
 version = 0
-manifest_digest = "0E6AA73010A71CAB5FAF9BF8EF30AE2BB11E0106B10FB5248AD821A52C6240ED"
+manifest_digest = "B52B14516285DC1D43B327DD8C1ECA953E1BF34B893F81D443E5A28B6D4712E4"
 deps_digest = "52B406A7A21811BEF51751CF88DA0E76DAEFFEAC888D4F4060B1A72BBE7D8D35"
 
 dependencies = [
@@ -20,7 +20,7 @@ source = { git = "https://github.com/MystenLabs/sui.git", rev = "framework/testn
 
 [[move.package]]
 name = "Pyth"
-source = { local = "../pyth" }
+source = { local = "../dependencies/pyth" }
 
 dependencies = [
   { name = "Sui" },
