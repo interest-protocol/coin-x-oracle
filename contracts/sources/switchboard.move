@@ -36,7 +36,7 @@ module coin_x_oracle::switchboard {
     df::add(uid, AggregatorKey {}, aggregator::aggregator_address(aggregator));
   }
 
-  public fun report<Witness: drop>(oracle: &Oracle<Witness>, request: &mut Request, aggregator: &Aggregator, witness: Witness) {
+  public fun report<Witness: drop>(oracle: &Oracle<Witness>, request: &mut Request, aggregator: &Aggregator) {
     let whitelisted_address = *df::borrow<AggregatorKey, address>(oracle::uid(oracle), AggregatorKey {});
     assert!(aggregator::aggregator_address(aggregator) == whitelisted_address, EInvalidAggregator);
 
@@ -46,6 +46,6 @@ module coin_x_oracle::switchboard {
 
     assert!(!neg, ENegativeValueIsNotValid);
 
-    oracle::report(request, witness, latest_timestamp, value, scaling_factor);
+    oracle::report(request, SwitchboardFeed {}, latest_timestamp, value, scaling_factor);
   }
 }

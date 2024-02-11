@@ -62,8 +62,7 @@ module coin_x_oracle::pyth {
     buf: vector<u8>,
     price_info_object: &mut PriceInfoObject,
     pyth_fee: Coin<SUI>,
-    clock_object: &Clock,
-    witness: Witness
+    clock_object: &Clock
   ) {
     let whitelisted_id = *df::borrow<PriceInfoObjectKey, ID>(oracle::uid(oracle), PriceInfoObjectKey {});
 
@@ -106,7 +105,7 @@ module coin_x_oracle::pyth {
     else 
       (pyth_price_u64 as u256)  * (pow(10, 18 - (pyth_exp_u64 as u8)) as u256);
 
-    oracle::report(request, witness, latest_timestamp, (value as u128), 18);
+    oracle::report(request, PythFeed {}, latest_timestamp, (value as u128), 18);
   }  
 
   // === Private Functions ===
