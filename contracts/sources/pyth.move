@@ -158,7 +158,7 @@ module coin_x_oracle::pyth {
   // === Private Functions ===
   
   /*
-  * @notice Ensures that we are reporting a price with a confidence interval of 98% or higher. 
+  * @notice Ensures that we are reporting a price within the required confidence interval. 
   *
   * @dev Read about price confidence intervals here: https://docs.pyth.network/price-feeds/pythnet-price-feeds/best-practices
   *
@@ -167,7 +167,7 @@ module coin_x_oracle::pyth {
   * @param price_conf The confidence interval for the `price_value`
   *
   * aborts-if:  
-  * - The `price_value`'s confidence interface is lower than 98%. 
+  * - The `price_value`'s confidence interface is lower than the `oracle` allows. 
   */
   fun assert_price_conf<Witness: drop>(oracle: &Oracle<Witness>, price_value: u64, price_conf: u64) {
     let price_conf_percentage = fixed_point_wad::div_up((price_conf as u256), (price_value as u256));
