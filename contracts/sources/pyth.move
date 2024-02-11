@@ -35,7 +35,7 @@ module coin_x_oracle::pyth {
 
   const POW_10_18: u256 = 1000000000000000000; // 1e18
   const TWO_PERCENT: u256 = 20000000000000000; // 0.02e18
-  const HUNDRED_PERCENT: u256 = 100000000000000000000; // 100e18
+  const HUNDRED_PERCENT: u256 = 1000000000000000000; // 1e18
 
   // === Structs ===
 
