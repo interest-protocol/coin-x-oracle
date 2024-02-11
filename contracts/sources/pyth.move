@@ -35,7 +35,7 @@ module coin_x_oracle::pyth {
 
   const POW_10_18: u256 = 1000000000000000000; // 1e18
   const TWO_PERCENT: u256 = 20000000000000000; // 0.02e18
-  const HUNDRED_PERCENT: u256 = 100000000000000000000; // 100e18.
+  const HUNDRED_PERCENT: u256 = 100000000000000000000; // 100e18
 
   // === Structs ===
 
@@ -139,7 +139,7 @@ module coin_x_oracle::pyth {
   /*
   * @notice Updates the required confidence interval percentage for the `self`.  
   * 
-  * @dev Note that you can add a confidence interface percentage of 0%. We recommend a value higher than 95%.
+  * @dev Note that you can add a confidence interval percentage of 0%. We recommend a value higher than 95%.
   *
   * @param self The `suiterars::oracle::Oracle` that will require a Pyth report.     
   * @param cap The `suitears::owner::OwnerCap` of `self`.   
@@ -167,7 +167,7 @@ module coin_x_oracle::pyth {
   * @param price_conf The confidence interval for the `price_value`
   *
   * aborts-if:  
-  * - The `price_value`'s confidence interface is lower than the `oracle` allows. 
+  * - The `price_value`'s confidence interval is lower than the `oracle` allows. 
   */
   fun assert_price_conf<Witness: drop>(oracle: &Oracle<Witness>, price_value: u64, price_conf: u64) {
     let price_conf_percentage = fixed_point_wad::div_up((price_conf as u256), (price_value as u256));
