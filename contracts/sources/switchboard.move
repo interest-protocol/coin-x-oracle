@@ -44,7 +44,7 @@ module coin_x_oracle::switchboard_oracle {
 
     assert!(!neg, ENegativeValueIsNotValid);
 
-    oracle::report(request, SwitchboardFeed {}, latest_timestamp, value, scaling_factor);
+    oracle::report(request, SwitchboardFeed {}, latest_timestamp * 1000, value, scaling_factor);
   }
 
   // === Admin Functions ===  
