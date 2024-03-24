@@ -1,6 +1,7 @@
 [package]
 name = "CoinXOracle"
 version = "0.2.0"
+published-at = "0x735f96ff10e20882ef2114289e15e8b9588fbd85991d59484613636aff83e932"
 
 [dependencies.MoveStdlib]
 git = "https://github.com/MystenLabs/sui.git"
@@ -19,15 +20,14 @@ git = "https://github.com/interest-protocol/suitears.git"
 subdir = "contracts"
 rev = "testnet"
 
-# [dependencies.SwitchboardStdLib]
-# git = "https://github.com/switchboard-xyz/sbv2-sui.git"
-# subdir = "move/testnet/switchboard_std/"
-# rev = "main"
-
-[dependencies.Pyth]
-local = "../dependencies/pyth"
+[dependencies.SwitchboardStdLib]
+git = "https://github.com/switchboard-xyz/sbv2-sui.git"
+subdir = "move/testnet/switchboard_std/"
+rev = "main"
 
 [addresses]
-coin_x_oracle = "0x0"
+coin_x_oracle = "0x735f96ff10e20882ef2114289e15e8b9588fbd85991d59484613636aff83e932"
 std = "0x1"
 sui = "0x2"
+suitears = "0x901b511b878f90f1b833df46648224b913df60f8b3165086caba6f59e75d6e98"
+switchboard =  "0x98670585b87e06628ef2d7f7cb1e7bee8ada65b43b82997935225a7e6e21d18e"
