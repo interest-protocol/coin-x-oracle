@@ -1,12 +1,10 @@
-module coin_x_oracle::pyth {
+module coin_x_oracle::pyth_oracle {
   // === Imports ===
   use std::type_name;
   
   use sui::object;
-  use sui::sui::SUI;
   use sui::math::pow;
   use sui::object::ID;
-  use sui::coin::Coin;
   use sui::clock::Clock;
   use sui::dynamic_field as df;
 
@@ -15,15 +13,11 @@ module coin_x_oracle::pyth {
   use suitears::owner::{Self, OwnerCap};
   use suitears::oracle::{Self, Oracle, Request};  
 
-  use wormhole::vaa::parse_and_verify;  
-  use wormhole::state::{State as WormholeState};
-
   use pyth::i64;
-  use pyth::hot_potato_vector;
   use pyth::state::State as PythState;
   use pyth::price::Self as pyth_price;
+  use pyth::pyth::get_price as pyth_get_price;
   use pyth::price_info::{Self, PriceInfoObject};
-  use pyth::pyth::{get_price as pyth_get_price, create_price_infos_hot_potato, update_single_price_feed};
 
   // === Errors ===
 
@@ -54,9 +48,7 @@ module coin_x_oracle::pyth {
   * @param request A hot potato issued from the `self` to create a `suiterars::oracle::Price`.  
   * @param wormhole_state The state of the Wormhole module on Sui.
   * @param pyth_state The state of the Pyth module on Sui.
-  * @param buf Price attestations in bytes.
   * @param price_info_object An object that contains price information. One per asset.
-  * @param pyth_fee There is a cost to request a price update from Pyth.
   * @param clock_object The shared Clock object from Sui.
   *
   * aborts-if:    
@@ -67,28 +59,13 @@ module coin_x_oracle::pyth {
   public fun report<Witness: drop>(
     oracle: &Oracle<Witness>, 
     request: &mut Request, 
-    wormhole_state: &WormholeState,
     pyth_state: &PythState,
-    buf: vector<u8>,
     price_info_object: &mut PriceInfoObject,
-    pyth_fee: Coin<SUI>,
     clock_object: &Clock
   ) {
     let whitelisted_id = *df::borrow<PriceInfoObjectKey, ID>(oracle::uid(oracle), PriceInfoObjectKey {});
 
     assert!(whitelisted_id == price_info::uid_to_inner(price_info_object), EInvalidPriceObjectInfo);
-    
-    let vaa = parse_and_verify(wormhole_state, buf, clock_object);
-
-    let hot_potato_vector = update_single_price_feed(
-      pyth_state,
-      create_price_infos_hot_potato(pyth_state, vector[vaa], clock_object),
-      price_info_object,
-      pyth_fee,
-      clock_object
-    );
-    
-    hot_potato_vector::destroy(hot_potato_vector);
 
     // Get the price raw value, exponent and timestamp
     let pyth_price = pyth_get_price(pyth_state, price_info_object, clock_object);
