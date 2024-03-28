@@ -1,0 +1,19 @@
+[package]
+name = "Wormhole"
+version = "0.2.0"
+published-at = "0xcc029e2810f17f9f43f52262f40026a71fbdca40ed3803ad2884994361910b7e"
+
+[dependencies.MoveStdlib]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/move-stdlib"
+rev = "041c5f2bae2fe52079e44b70514333532d69f4e6"
+
+[dependencies.Sui]
+git = "https://github.com/MystenLabs/sui.git"
+subdir = "crates/sui-framework/packages/sui-framework"
+rev = "041c5f2bae2fe52079e44b70514333532d69f4e6"
+
+[addresses]
+std = "0x1"
+sui = "0x2"
+wormhole = "0xcc029e2810f17f9f43f52262f40026a71fbdca40ed3803ad2884994361910b7e"
