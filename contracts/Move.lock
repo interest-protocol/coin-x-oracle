@@ -60,8 +60,3 @@ source = { git = "https://github.com/wormhole-foundation/wormhole.git", rev = "s
 dependencies = [
   { name = "Sui" },
 ]
-
-[move.toolchain-version]
-compiler-version = "1.21.0"
-edition = "legacy"
-flavor = "sui"
