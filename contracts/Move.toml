@@ -19,13 +19,20 @@ git = "https://github.com/interest-protocol/suitears.git"
 subdir = "contracts"
 rev = "testnet"
 
-# [dependencies.SwitchboardStdLib]
-# git = "https://github.com/switchboard-xyz/sbv2-sui.git"
-# subdir = "move/testnet/switchboard_std/"
-# rev = "main"
-
 [dependencies.Pyth]
-local = "../dependencies/pyth"
+git = "https://github.com/pyth-network/pyth-crosschain.git"
+subdir = "target_chains/sui/contracts"
+rev = "sui-contract-v0.0.2-testnet-sui-1.19.1"
+ 
+[dependencies.Wormhole]
+git = "https://github.com/wormhole-foundation/wormhole.git"
+subdir = "sui/wormhole"
+rev = "sui-upgrade-testnet"
+
+[dependencies.SwitchboardStdLib]
+git = "https://github.com/switchboard-xyz/sbv2-sui.git"
+subdir = "move/testnet/switchboard_std/"
+rev = "main"
 
 [addresses]
 coin_x_oracle = "0x0"

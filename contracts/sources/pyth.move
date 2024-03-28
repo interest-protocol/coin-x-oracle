@@ -30,6 +30,7 @@ module coin_x_oracle::pyth_oracle {
   const POW_10_18: u256 = 1000000000000000000; // 1e18
   const TWO_PERCENT: u256 = 20000000000000000; // 0.02e18
   const HUNDRED_PERCENT: u256 = 1000000000000000000; // 1e18
+  const TIME_SCALAR: u64 = 1000;
 
   // === Structs ===
 
@@ -92,7 +93,7 @@ module coin_x_oracle::pyth_oracle {
     else 
       (pyth_price_u64 as u256)  * (pow(10, 18 - (pyth_exp_u64 as u8)) as u256);
 
-    oracle::report(request, PythFeed {}, latest_timestamp, (value as u128), 18);
+    oracle::report(request, PythFeed {}, latest_timestamp * TIME_SCALAR, (value as u128), 18);
   }  
 
   // === Admin Functions ===  

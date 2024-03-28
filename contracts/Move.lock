@@ -2,14 +2,16 @@
 
 [move]
 version = 0
-manifest_digest = "9F370E2AA6AEBD8D3F813F46B79964C3F6BAE2E4D0448F526907153FF6EB57C2"
-deps_digest = "F9B494B64F0615AED0E98FC12A85B85ECD2BC5185C22D30E7F67786BB52E507C"
+manifest_digest = "AFB58894F1455DFF6452D7D8FDE454BEE1620FDEC7A66DADE5BFB4C44601832C"
+deps_digest = "52B406A7A21811BEF51751CF88DA0E76DAEFFEAC888D4F4060B1A72BBE7D8D35"
 
 dependencies = [
   { name = "MoveStdlib" },
   { name = "Pyth" },
   { name = "Sui" },
   { name = "SuiTears" },
+  { name = "SwitchboardStdLib" },
+  { name = "Wormhole" },
 ]
 
 [[move.package]]
@@ -18,7 +20,7 @@ source = { git = "https://github.com/MystenLabs/sui.git", rev = "framework/testn
 
 [[move.package]]
 name = "Pyth"
-source = { local = "../dependencies/pyth" }
+source = { git = "https://github.com/pyth-network/pyth-crosschain.git", rev = "sui-contract-v0.0.2-testnet-sui-1.19.1", subdir = "target_chains/sui/contracts" }
 
 dependencies = [
   { name = "Sui" },
@@ -43,9 +45,23 @@ dependencies = [
 ]
 
 [[move.package]]
+name = "SwitchboardStdLib"
+source = { git = "https://github.com/switchboard-xyz/sbv2-sui.git", rev = "main", subdir = "move/testnet/switchboard_std/" }
+
+dependencies = [
+  { name = "MoveStdlib" },
+  { name = "Sui" },
+]
+
+[[move.package]]
 name = "Wormhole"
-source = { local = "../dependencies/wormhole" }
+source = { git = "https://github.com/wormhole-foundation/wormhole.git", rev = "sui-upgrade-testnet", subdir = "sui/wormhole" }
 
 dependencies = [
   { name = "Sui" },
 ]
+
+[move.toolchain-version]
+compiler-version = "1.21.0"
+edition = "legacy"
+flavor = "sui"
